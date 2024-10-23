@@ -1,0 +1,10 @@
+-- Create two tables for the example
+DROP TABLE IF EXISTS Table1
+DROP TABLE IF EXISTS Table2
+GO
+CREATE TABLE Table1 (ID INT PRIMARY KEY);
+CREATE TABLE Table2 (ID INT PRIMARY KEY);
+GO
+-- Insert sample data
+INSERT INTO Table1 (ID) VALUES (1);
+INSERT INTO Table2 (ID) VALUES (1);
