@@ -1,5 +1,63 @@
---waitresource=“PAGE: 6:1:408 " = Database_Id : FileId : PageNumber
+DECLARE @resource_description VARCHAR(100) = 'PAGE: 6:1:400';
 
+-- Переменные для хранения частей строки
+DECLARE @resource_type VARCHAR(50);
+DECLARE @database_id INT;
+DECLARE @file_id INT;
+DECLARE @page_id INT;
+
+-- Извлечение значений из строки
+SET @resource_type = LEFT(@resource_description, CHARINDEX(':', @resource_description) - 1);
+
+SET @database_id = CAST(SUBSTRING(
+    @resource_description,
+    CHARINDEX(':', @resource_description) + 2,
+    CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description) + 1) - CHARINDEX(':', @resource_description) - 2
+) AS INT);
+
+SET @file_id = CAST(SUBSTRING(
+    @resource_description,
+    CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description) + 1) + 1,
+    CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description) + 1) + 1) - CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description) + 1) - 1
+) AS INT);
+
+SET @page_id = CAST(RIGHT(@resource_description, LEN(@resource_description) - CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description, CHARINDEX(':', @resource_description) + 1) + 1)) AS INT);
+
+-- Проверка результатов
+SELECT 
+    @resource_type AS ResourceType,
+    @database_id AS DatabaseID,
+    @file_id AS FileID,
+    @page_id AS PageID;
+
+--DECLARE @database_id INT = 6;
+--DECLARE @file_id INT = 1; 
+--DECLARE @page_id INT = 400;
+
+
+
+SELECT
+    OBJECT_NAME(p.[OBJECT_ID], @database_id) AS table_name,
+    i.name AS index_name,
+    -- Используем другие столбцы из sys.dm_db_page_info
+    STUFF((
+        SELECT ', ' + c.name
+        FROM sys.columns c
+        WHERE c.object_id = p.object_id
+		AND c.column_id = ic.column_id 
+        FOR XML PATH(''), TYPE
+    ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS index_column_names
+FROM sys.dm_db_page_info(@database_id, @file_id, @page_id, 'DETAILED') p
+LEFT JOIN sys.indexes i ON p.object_id = i.object_id AND p.index_id = i.index_id
+LEFT JOIN sys.index_columns ic ON ic.index_id = i.index_id and ic.[object_id] = i.[object_id]
+
+
+SELECT 
+    sys.fn_PhysLocFormatter (%%physloc%%),
+    *
+FROM TestTableHeap (NOLOCK)
+WHERE sys.fn_PhysLocFormatter (%%physloc%%) like '(1:408%'
+GO
 --Decode the database_id
 
 SELECT 

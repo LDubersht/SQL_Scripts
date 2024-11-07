@@ -1,0 +1,13 @@
+USE master;
+GO
+DECLARE @OBJ_ID NVARCHAR(10) = N'480772820';
+DECLARE @IDX_ID NVARCHAR(10) = N'27';
+DECLARE @DBID INT            = 7;
+DECLARE @CHECKSTUFF NVARCHAR(MAX) = N'USE ' + DB_NAME(@DBID) + N'
+SELECT OBJECT_NAME(' + @OBJ_ID + N') AS OBBJNAME
+,SIDX.[name]
+FROM sys.indexes SIDX
+WHERE sidx.object_id = ' + @OBJ_ID + N'
+AND sidx.index_id    = ' + @IDX_ID + '
+';
+EXEC (@CHECKSTUFF);
