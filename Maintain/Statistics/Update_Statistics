@@ -4,7 +4,7 @@ DECLARE updatestats CURSOR FOR
 SELECT ist.TABLE_SCHEMA,ist.table_name 
 FROM information_schema.tables ist
 WHERE TABLE_TYPE = 'BASE TABLE'
-and ist.TABLE_SCHEMA = 'portal'
+ORDER BY TABLE_SCHEMA,TABLE_NAME
 OPEN updatestats
 
 DECLARE @tablename NVARCHAR(128)
