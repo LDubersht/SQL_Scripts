@@ -1,0 +1,31 @@
+SET NOCOUNT ON
+GO
+DECLARE updatestats CURSOR FOR
+SELECT ist.TABLE_SCHEMA,ist.table_name 
+FROM information_schema.tables ist
+WHERE TABLE_TYPE = 'BASE TABLE'
+and ist.TABLE_SCHEMA = 'portal'
+OPEN updatestats
+
+DECLARE @tablename NVARCHAR(128)
+DECLARE @schemaname NVARCHAR(128)
+DECLARE @Statement NVARCHAR(300)
+
+FETCH NEXT FROM updatestats INTO @schemaname, @tablename
+WHILE (@@FETCH_STATUS = 0)
+BEGIN
+   PRINT N'PRINT ''UPDATING:''  '+ QUOTENAME(@schemaname) + '.' + QUOTENAME(@tablename)
+   SET @Statement = 'DECLARE @t DATETIME = GETDATE() UPDATE STATISTICS '  + QUOTENAME(@schemaname) + '.' + QUOTENAME(@tablename) + '  WITH FULLSCAN; 
+   PRINT datediff(ms,getdate(),@t)'
+   print @Statement + char(13)+char(10) + 'GO'
+
+   --EXEC sp_executesql @Statement
+
+   FETCH NEXT FROM updatestats INTO @schemaname,@tablename
+END
+
+CLOSE updatestats
+DEALLOCATE updatestats
+GO
+SET NOCOUNT OFF
+GO
