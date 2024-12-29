@@ -3,7 +3,7 @@ DECLARE @FileName NVARCHAR(128),
         @FileSizeMB FLOAT,
 		@DestFileSizeMB int,
         @AvailableSpaceMB FLOAT,
-        @ShrinkDataStepSizeMB INT = 500,
+        @ShrinkDataStepSizeMB INT = 2000,
         @ShrinkLogStepSizePercent INT = 10,
         @WaitTimeAfterStep INT = 10, -- in seconds
         @WaitTimeAfterCycle INT = 60, -- in seconds
@@ -41,13 +41,11 @@ BEGIN
 
 				SET @ElapsedTime = DATEDIFF(SECOND, @StartTime, GETDATE());
 				RAISERROR ('Shrink step completed for file %s. Time taken: %d seconds.', 10, 1, @FileName, @ElapsedTime) WITH NOWAIT;
-
-				WAITFOR DELAY '00:00:01';
 			END
 			ELSE 
 		    BEGIN
+				WAITFOR DELAY '00:00:10';
 				RAISERROR ('DataFile %s has less than free space. Waiting for the next cycle.', 10, 1, @FileName) WITH NOWAIT;
-				WAITFOR DELAY '00:01:01';
 			END
 		END
 		IF  @FileType = 1
@@ -62,16 +60,14 @@ BEGIN
 
 				SET @ElapsedTime = DATEDIFF(SECOND, @StartTime, GETDATE());
 				RAISERROR ('Shrink step completed for file %s. Time taken: %d seconds.', 10, 1, @FileName, @ElapsedTime) WITH NOWAIT;
-
-				WAITFOR DELAY '00:00:01';
 			END
 			ELSE
 			BEGIN
 				RAISERROR ('File %s has less than free space. Waiting for the next cycle.', 10, 1, @FileName) WITH NOWAIT;
-				WAITFOR DELAY '00:01:01';
+				WAITFOR DELAY '00:00:10';
 			END
 		END
-        
+        WAITFOR DELAY '00:00:01';
 		FETCH NEXT FROM FileCursor INTO @FileName, @FileType, @FileSizeMB, @AvailableSpaceMB;
     END
 
