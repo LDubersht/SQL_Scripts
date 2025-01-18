@@ -4,7 +4,7 @@ SET @dbName = DB_NAME();  -- Current database
 
 DECLARE @fragmentationThreshold FLOAT,@rebuildThreshold FLOAT
 SET @fragmentationThreshold = 5.0  -- Threshold fragmentation in percent
-SET @rebuildThreshold = 10.0 -- Threshold rebuild percent
+SET @rebuildThreshold = 25.0 -- Threshold rebuild percent
 
 DECLARE @schemaName NVARCHAR(128)
 DECLARE @tableName NVARCHAR(128)
@@ -55,7 +55,7 @@ BEGIN
                END
     
 	print @sql
-    --EXEC sp_executesql @sql
+    EXEC sp_executesql @sql
 
     FETCH NEXT FROM index_cursor INTO @schemaName, @tableName, @indexName, @fragmentation
 END

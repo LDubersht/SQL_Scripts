@@ -18,6 +18,6 @@ JOIN sys.dm_db_missing_index_group_stats migs ON
     migs.group_handle = mig.index_group_handle
 JOIN sys.dm_db_missing_index_details mid ON 
     mig.index_handle = mid.index_handle
-	WHERE  mid.statement = '[Analytics].[dbo].[f835_RemarkCodes]'
+	WHERE  mid.statement = '[DB].[dbo].[TableName]'
 ORDER BY estimated_improvement DESC;
 GO
