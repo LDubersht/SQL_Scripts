@@ -1,6 +1,6 @@
 DECLARE @SQL nvarchar(1000);
 DECLARE @DB_Name nvarchar(128);;
-SET @DB_Name = 'gp_agents'
+SET @DB_Name = '<DBName>'
 IF EXISTS (SELECT 1 FROM sys.databases WHERE [name] = @DB_Name)
 BEGIN
     SET @SQL = N'USE ['+@DB_Name+'];
